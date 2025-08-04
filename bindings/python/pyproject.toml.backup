@@ -16,49 +16,26 @@
 # under the License.
 
 [build-system]
-build-backend = "setuptools.build_meta"
-requires = ["setuptools>=61.0"]
+build-backend = "maturin"
+requires = ["maturin>=1.0,<2.0"]
 
 [project]
-name = "opendal"
-version = "0.46.0"
-description = "Apache OpenDAL™ Python Binding - Unified Data Access Layer"
-license = { text = "Apache-2.0" }
-readme = "README.md"
-requires-python = ">=3.10"
-authors = [
-    {name = "Apache OpenDAL", email = "dev@opendal.apache.org"},
-]
 classifiers = [
   "Programming Language :: Rust",
   "Programming Language :: Python :: Implementation :: CPython",
 ]
-keywords = ["storage", "rust", "s3", "azure", "gcs"]
+description = "Apache OpenDAL™ Python Binding"
+license = { text = "Apache-2.0" }
+name = "opendal"
+readme = "README.md"
+requires-python = ">=3.10"
 
-# Core services - development mode (no strict dependencies)
-dependencies = [
-    # opendal-core will be installed separately for development/testing
-]
-
-# Optional service groups - for development and production use
-[project.optional-dependencies]
-database = ["opendal-database"]
-cloud = ["opendal-cloud"] 
-advanced = ["opendal-advanced"]
-all = [
-    "opendal-database",
-    "opendal-cloud", 
-    "opendal-advanced"
-]
+dynamic = ['version']
 
 [project.urls]
 Documentation = "https://opendal.apache.org/docs/python/index.html"
 Homepage = "https://opendal.apache.org/"
 Repository = "https://github.com/apache/opendal"
-
-[tool.setuptools]
-packages = ["opendal"]
-package-dir = {"opendal" = "python/opendal"}
 
 [dependency-groups]
 benchmark = [
@@ -79,11 +56,17 @@ test = [
   "pydantic-settings>=2.8.1",
 ]
 
+[tool.maturin]
+features = ["pyo3/extension-module"]
+module-name = "opendal._opendal"
+python-source = "python"
+strip = true
+
 [tool.uv]
 cache-keys = [
   { file = "pyproject.toml" },
   { file = "Cargo.toml" },
-  { file = "packages/**/*.rs" },
+  { file = "src/**/*.rs" },
   { file = "../../core/**/*.rs" },
 ]
 

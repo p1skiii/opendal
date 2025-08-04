@@ -15,24 +15,27 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# Virtual workspace root package for toolchain compatibility
+[package]
+name = "opendal-workspace"
+version = "0.45.20"
+edition = "2021"
+publish = false
+
 [workspace]
 members = [
-    "shared",
     "packages/opendal-core",
-    "packages/opendal-database",
-    "packages/opendal-cloud", 
-    "packages/opendal-advanced",
-    # Note: opendal router package uses setuptools, not part of Rust workspace
+    "packages/opendal-service-redis",
+    # Add more service packages here as needed
 ]
 resolver = "2"
 
-# Workspace dependencies shared by all Rust packages
+# Shared workspace dependencies for all packages
 [workspace.dependencies]
 bytes = "1.5.0"
 chrono = "0.4"
 dict_derive = "0.6.0"
 futures = "0.3.28"
-# this crate won't be published, we always use the local version
 opendal = { version = ">=0", path = "../../core", features = [
   "blocking",
   "layers-mime-guess"

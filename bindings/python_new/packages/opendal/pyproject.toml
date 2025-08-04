@@ -1,0 +1,19 @@
+# This is a pure Python package, so we use setuptools, not maturin.
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opendal"
+version = "0.45.20"
+description = "OpenDAL Python binding"
+authors = [{ name = "Apache OpenDAL", email = "dev@opendal.apache.org" }]
+license = { "text" = "Apache-2.0" }
+requires-python = ">=3.8"
+dependencies = [
+    "opendal-core == 0.45.20"
+]
+
+# Tell setuptools where to find the package source
+[tool.setuptools.packages.find]
+where = ["src"]

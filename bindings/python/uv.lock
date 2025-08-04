@@ -1190,7 +1190,27 @@ wheels = [
 
 [[package]]
 name = "opendal"
+version = "0.46.0"
 source = { editable = "." }
+dependencies = [
+    { name = "opendal-core" },
+]
+
+[package.optional-dependencies]
+advanced = [
+    { name = "opendal-advanced" },
+]
+all = [
+    { name = "opendal-advanced" },
+    { name = "opendal-cloud" },
+    { name = "opendal-database" },
+]
+cloud = [
+    { name = "opendal-cloud" },
+]
+database = [
+    { name = "opendal-database" },
+]
 
 [package.dev-dependencies]
 benchmark = [
@@ -1221,6 +1241,16 @@ test = [
 ]
 
 [package.metadata]
+requires-dist = [
+    { name = "opendal-advanced", marker = "extra == 'advanced'", path = "packages/opendal-advanced/dist/opendal_advanced-0.46.0-cp311-cp311-macosx_11_0_arm64.whl" },
+    { name = "opendal-advanced", marker = "extra == 'all'", path = "packages/opendal-advanced/dist/opendal_advanced-0.46.0-cp311-cp311-macosx_11_0_arm64.whl" },
+    { name = "opendal-cloud", marker = "extra == 'all'", path = "packages/opendal-cloud/dist/opendal_cloud-0.46.0-cp311-cp311-macosx_11_0_arm64.whl" },
+    { name = "opendal-cloud", marker = "extra == 'cloud'", path = "packages/opendal-cloud/dist/opendal_cloud-0.46.0-cp311-cp311-macosx_11_0_arm64.whl" },
+    { name = "opendal-core", path = "packages/opendal-core/dist/opendal_core-0.46.0-cp311-cp311-macosx_11_0_arm64.whl" },
+    { name = "opendal-database", marker = "extra == 'all'", path = "packages/opendal-database/dist/opendal_database-0.46.0-cp311-cp311-macosx_11_0_arm64.whl" },
+    { name = "opendal-database", marker = "extra == 'database'", path = "packages/opendal-database/dist/opendal_database-0.46.0-cp311-cp311-macosx_11_0_arm64.whl" },
+]
+provides-extras = ["database", "cloud", "advanced", "all"]
 
 [package.metadata.requires-dev]
 benchmark = [
@@ -1244,6 +1274,38 @@ test = [
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-asyncio", specifier = ">=0.25.3" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
+]
+
+[[package]]
+name = "opendal-advanced"
+version = "0.46.0"
+source = { path = "packages/opendal-advanced/dist/opendal_advanced-0.46.0-cp311-cp311-macosx_11_0_arm64.whl" }
+wheels = [
+    { filename = "opendal_advanced-0.46.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:f91b1d7221a60958351cdcd7275cb5cb9798ea9a6eaf410ecd2424d807d2e4a0" },
+]
+
+[[package]]
+name = "opendal-cloud"
+version = "0.46.0"
+source = { path = "packages/opendal-cloud/dist/opendal_cloud-0.46.0-cp311-cp311-macosx_11_0_arm64.whl" }
+wheels = [
+    { filename = "opendal_cloud-0.46.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:9cc7cd2349ee3638006b9aa5a42ea2455a4d3cf4c353b94f627e947690a043dc" },
+]
+
+[[package]]
+name = "opendal-core"
+version = "0.46.0"
+source = { path = "packages/opendal-core/dist/opendal_core-0.46.0-cp311-cp311-macosx_11_0_arm64.whl" }
+wheels = [
+    { filename = "opendal_core-0.46.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:80fa80ad975cb44d53c7290a835bf540ba7c0209b66d917ca98c4fe65989a6b4" },
+]
+
+[[package]]
+name = "opendal-database"
+version = "0.46.0"
+source = { path = "packages/opendal-database/dist/opendal_database-0.46.0-cp311-cp311-macosx_11_0_arm64.whl" }
+wheels = [
+    { filename = "opendal_database-0.46.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:72d97c0f63e69d162bec0543b0fdf6d92f2f1e745536a4023a4c979358c6a8b0" },
 ]
 
 [[package]]

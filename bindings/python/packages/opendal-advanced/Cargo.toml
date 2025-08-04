@@ -1,0 +1,82 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+[package]
+name = "opendal-advanced"
+publish = false
+
+authors = ["Apache OpenDAL <dev@opendal.apache.org>"]
+edition = "2021"
+homepage = "https://opendal.apache.org/"
+license = "Apache-2.0"
+repository = "https://github.com/apache/opendal"
+rust-version = "1.82"
+version = "0.46.0"
+
+[features]
+# Advanced services (based on tested services from backup)
+default = [
+  "services-azfile",
+  "services-mini-moka",
+  "services-monoiofs",
+  # NOTE: ftp, hdfs, sftp are commented out in backup due to issues
+  "services-cacache",
+]
+
+# File System Extensions (verified to exist)
+services-azfile = ["opendal/services-azfile"]
+services-monoiofs = ["opendal/services-monoiofs"]
+
+# Cache Systems (verified to exist)
+services-mini-moka = ["opendal/services-mini-moka"]
+services-cacache = ["opendal/services-cacache"]
+
+# Commented out services from backup due to build issues:
+# services-ftp = ["opendal/services-ftp"]  # commented out in backup
+# services-hdfs = ["opendal/services-hdfs"]  # "how to support HDFS services in bindings?"
+# services-hdfs-native = ["opendal/services-hdfs-native"]  # commented out in backup
+# services-sftp = ["opendal/services-sftp"]  # depends on openssh with platform limitations
+
+# ABI3 support
+abi3 = ["pyo3/abi3-py311"]
+
+[lib]
+name = "opendal_advanced"
+crate-type = ["cdylib"]
+doc = false
+path = "src/lib.rs"
+
+[dependencies]
+bytes = { workspace = true }
+chrono = { workspace = true }
+dict_derive = { workspace = true }
+futures = { workspace = true }
+opendal = { workspace = true }
+opendal-python-shared = { path = "../../shared" }
+pyo3 = { workspace = true }
+pyo3-async-runtimes = { workspace = true }
+tokio = { workspace = true }
+
+[target.'cfg(unix)'.dependencies.opendal]
+features = [
+  "blocking",
+  "layers-mime-guess",
+  # SFTP depends on openssh which has platform limitations
+  "services-sftp",
+]
+path = "../../../../core"
+version = ">=0"

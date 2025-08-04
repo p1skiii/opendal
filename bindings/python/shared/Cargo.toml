@@ -15,28 +15,28 @@
 # specific language governing permissions and limitations
 # under the License.
 
-[workspace]
-members = [
-    "shared",
-    "packages/opendal-core",
-    "packages/opendal-database",
-    "packages/opendal-cloud", 
-    "packages/opendal-advanced",
-    # Note: opendal router package uses setuptools, not part of Rust workspace
-]
-resolver = "2"
+[package]
+name = "opendal-python-shared"
+publish = false
 
-# Workspace dependencies shared by all Rust packages
-[workspace.dependencies]
-bytes = "1.5.0"
-chrono = "0.4"
-dict_derive = "0.6.0"
-futures = "0.3.28"
-# this crate won't be published, we always use the local version
-opendal = { version = ">=0", path = "../../core", features = [
-  "blocking",
-  "layers-mime-guess"
-] }
-pyo3 = { version = "0.25.1", features = ["generate-import-lib", "chrono"] }
-pyo3-async-runtimes = { version = "0.25.0", features = ["tokio-runtime"] }
-tokio = "1"
+authors = ["Apache OpenDAL <dev@opendal.apache.org>"]
+edition = "2021"
+homepage = "https://opendal.apache.org/"
+license = "Apache-2.0"
+repository = "https://github.com/apache/opendal"
+rust-version = "1.82"
+version = "0.46.0"
+
+[lib]
+name = "opendal_python_shared"
+path = "src/lib.rs"
+
+[dependencies]
+bytes = { workspace = true }
+chrono = { workspace = true }
+dict_derive = { workspace = true }
+futures = { workspace = true }
+opendal = { workspace = true }
+pyo3 = { workspace = true }
+pyo3-async-runtimes = { workspace = true }
+tokio = { workspace = true }

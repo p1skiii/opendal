@@ -15,28 +15,15 @@
 # specific language governing permissions and limitations
 # under the License.
 
-[workspace]
-members = [
-    "shared",
-    "packages/opendal-core",
-    "packages/opendal-database",
-    "packages/opendal-cloud", 
-    "packages/opendal-advanced",
-    # Note: opendal router package uses setuptools, not part of Rust workspace
-]
-resolver = "2"
+"""
+OpenDAL Core Services Package
 
-# Workspace dependencies shared by all Rust packages
-[workspace.dependencies]
-bytes = "1.5.0"
-chrono = "0.4"
-dict_derive = "0.6.0"
-futures = "0.3.28"
-# this crate won't be published, we always use the local version
-opendal = { version = ">=0", path = "../../core", features = [
-  "blocking",
-  "layers-mime-guess"
-] }
-pyo3 = { version = "0.25.1", features = ["generate-import-lib", "chrono"] }
-pyo3-async-runtimes = { version = "0.25.0", features = ["tokio-runtime"] }
-tokio = "1"
+Provides access to core storage services including:
+- S3, Azure Blob, Google Cloud Storage
+- File system, HTTP, Memory
+- And other fundamental storage backends
+"""
+
+from ._opendal_core import *
+
+__all__ = _opendal_core.__all__

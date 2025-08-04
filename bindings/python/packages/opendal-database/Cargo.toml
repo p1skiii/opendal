@@ -1,0 +1,88 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+[package]
+name = "opendal-database"
+publish = false
+
+authors = ["Apache OpenDAL <dev@opendal.apache.org>"]
+edition = "2021"
+homepage = "https://opendal.apache.org/"
+license = "Apache-2.0"
+repository = "https://github.com/apache/opendal"
+rust-version = "1.82"
+version = "0.46.0"
+
+[features]
+# Database services (based on tested services from backup)
+default = [
+  "services-mysql",
+  "services-postgresql", 
+  "services-sqlite",
+  "services-mongodb",
+  "services-gridfs",
+  "services-redis",
+  "services-memcached",
+  # NOTE: etcd, foundationdb, tikv, rocksdb are commented out in backup due to issues
+  "services-sled",
+  "services-redb", 
+  "services-persy",
+]
+
+# SQL Databases (verified to exist)
+services-mysql = ["opendal/services-mysql"]
+services-postgresql = ["opendal/services-postgresql"]
+services-sqlite = ["opendal/services-sqlite"]
+
+# NoSQL Databases (verified to exist)
+services-mongodb = ["opendal/services-mongodb"]
+services-gridfs = ["opendal/services-gridfs"]
+services-redis = ["opendal/services-redis"]
+
+# Cache Systems (verified to exist)
+services-memcached = ["opendal/services-memcached"]
+
+# Commented out services from backup due to build issues:
+# services-etcd = ["opendal/services-etcd"]  # needs protoc
+# services-foundationdb = ["opendal/services-foundationdb"]  # needs preinstalled fdb library
+# services-tikv = ["opendal/services-tikv"]  # needs protoc
+# services-rocksdb = ["opendal/services-rocksdb"]  # build issues in bindings
+
+# Local Storage Engines (verified to exist)
+services-sled = ["opendal/services-sled"]
+services-redb = ["opendal/services-redb"]
+services-persy = ["opendal/services-persy"]
+
+# ABI3 support
+abi3 = ["pyo3/abi3-py311"]
+
+[lib]
+name = "opendal_database"
+crate-type = ["cdylib"]
+doc = false
+path = "src/lib.rs"
+
+[dependencies]
+bytes = { workspace = true }
+chrono = { workspace = true }
+dict_derive = { workspace = true }
+futures = { workspace = true }
+opendal = { workspace = true }
+opendal-python-shared = { path = "../../shared" }
+pyo3 = { workspace = true }
+pyo3-async-runtimes = { workspace = true }
+tokio = { workspace = true }

@@ -1,0 +1,117 @@
+{
+  "opendal_core": {
+    "package_name": "opendal_core",
+    "wheel_path": "/Users/wang/i/opendal/bindings/python/packages/opendal-core/dist/opendal_core-0.46.0-cp311-cp311-macosx_11_0_arm64.whl",
+    "import_success": true,
+    "import_output": "✅ 基本导入成功\n✅ Operator 类可用\n✅ AsyncOperator 类可用",
+    "service_results": {
+      "memory": {
+        "success": true,
+        "output": "✅ Operator 创建成功\n✅ 写入成功\n✅ 读取验证成功\n✅ 元数据获取成功: 大小=25\n✅ 删除成功",
+        "error": null
+      },
+      "fs": {
+        "success": true,
+        "output": "✅ Operator 创建成功\n✅ 写入成功\n✅ 读取验证成功\n✅ 元数据获取成功: 大小=25\n✅ 删除成功",
+        "error": null
+      },
+      "http": {
+        "success": true,
+        "output": "✅ Operator 创建成功\n⚠️ 仅配置验证（需要外部服务）",
+        "error": null
+      }
+    },
+    "success_rate": "3/3",
+    "overall_success": true
+  },
+  "opendal_database": {
+    "package_name": "opendal_database",
+    "wheel_path": "/Users/wang/i/opendal/bindings/python/packages/opendal-database/dist/opendal_database-0.46.0-cp311-cp311-macosx_11_0_arm64.whl",
+    "import_success": true,
+    "import_output": "✅ 基本导入成功\n✅ Operator 类可用\n✅ AsyncOperator 类可用",
+    "service_results": {
+      "sled": {
+        "success": true,
+        "output": "✅ Operator 创建成功\n✅ 写入成功\n✅ 读取验证成功\n✅ 元数据获取成功: 大小=25\n✅ 删除成功",
+        "error": null
+      },
+      "redb": {
+        "success": true,
+        "output": "✅ Operator 创建成功\n✅ 写入成功\n✅ 读取验证成功\n✅ 元数据获取成功: 大小=25\n✅ 删除成功",
+        "error": null
+      },
+      "persy": {
+        "success": false,
+        "output": "❌ 服务测试失败: ConfigInvalid (permanent) at  => segment is required but not set\n\nContext:\n   service: persy",
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 11, in <module>\nopendal.exceptions.ConfigInvalid: ConfigInvalid (permanent) at  => segment is required but not set\n\nContext:\n   service: persy\n\n"
+      },
+      "redis": {
+        "success": true,
+        "output": "✅ Operator 创建成功\n⚠️ 仅配置验证（需要外部服务）",
+        "error": null
+      },
+      "sqlite": {
+        "success": true,
+        "output": "✅ Operator 创建成功\n⚠️ 仅配置验证（需要外部服务）",
+        "error": null
+      }
+    },
+    "success_rate": "4/5",
+    "overall_success": true
+  },
+  "opendal_cloud": {
+    "package_name": "opendal_cloud",
+    "wheel_path": "/Users/wang/i/opendal/bindings/python/packages/opendal-cloud/dist/opendal_cloud-0.46.0-cp311-cp311-macosx_11_0_arm64.whl",
+    "import_success": true,
+    "import_output": "✅ 基本导入成功\n✅ Operator 类可用\n✅ AsyncOperator 类可用",
+    "service_results": {
+      "dashmap": {
+        "success": true,
+        "output": "✅ Operator 创建成功\n✅ 写入成功\n✅ 读取验证成功\n✅ 元数据获取成功: 大小=25\n✅ 删除成功",
+        "error": null
+      },
+      "moka": {
+        "success": true,
+        "output": "✅ Operator 创建成功\n✅ 写入成功\n✅ 读取验证成功\n✅ 元数据获取成功: 大小=25\n✅ 删除成功",
+        "error": null
+      },
+      "dropbox": {
+        "success": true,
+        "output": "✅ Operator 创建成功\n⚠️ 仅配置验证（需要外部服务）",
+        "error": null
+      },
+      "b2": {
+        "success": false,
+        "output": "❌ 服务测试失败: ConfigInvalid (permanent) at Builder::build => bucket_id is empty\n\nContext:\n   service: b2",
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 11, in <module>\nopendal.exceptions.ConfigInvalid: ConfigInvalid (permanent) at Builder::build => bucket_id is empty\n\nContext:\n   service: b2\n\n"
+      }
+    },
+    "success_rate": "3/4",
+    "overall_success": true
+  },
+  "opendal_advanced": {
+    "package_name": "opendal_advanced",
+    "wheel_path": "/Users/wang/i/opendal/bindings/python/packages/opendal-advanced/dist/opendal_advanced-0.46.0-cp311-cp311-macosx_11_0_arm64.whl",
+    "import_success": true,
+    "import_output": "✅ 基本导入成功\n✅ Operator 类可用\n✅ AsyncOperator 类可用",
+    "service_results": {
+      "cacache": {
+        "success": true,
+        "output": "✅ Operator 创建成功\n✅ 写入成功\n✅ 读取验证成功\n✅ 元数据获取成功: 大小=25\n✅ 删除成功",
+        "error": null
+      },
+      "azfile": {
+        "success": true,
+        "output": "✅ Operator 创建成功\n⚠️ 仅配置验证（需要外部服务）",
+        "error": null
+      },
+      "monoiofs": {
+        "success": false,
+        "output": "❌ 服务测试失败: ConfigInvalid (permanent) at Builder::build => root is not specified",
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 11, in <module>\nopendal.exceptions.ConfigInvalid: ConfigInvalid (permanent) at Builder::build => root is not specified\n\n"
+      }
+    },
+    "success_rate": "2/3",
+    "overall_success": true
+  }
+}

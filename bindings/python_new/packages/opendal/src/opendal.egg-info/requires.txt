@@ -1,0 +1,1 @@
+opendal-core==0.45.20

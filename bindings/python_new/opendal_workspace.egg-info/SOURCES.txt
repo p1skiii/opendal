@@ -1,0 +1,8 @@
+pyproject.toml
+opendal_workspace.egg-info/PKG-INFO
+opendal_workspace.egg-info/SOURCES.txt
+opendal_workspace.egg-info/dependency_links.txt
+opendal_workspace.egg-info/requires.txt
+opendal_workspace.egg-info/top_level.txt
+tests/test_capability.py
+tests/test_read.py

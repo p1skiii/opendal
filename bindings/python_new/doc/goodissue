@@ -1,0 +1,436 @@
+Skip to content
+Navigation Menu
+PyO3
+maturin
+
+Type / to search
+Code
+Issues
+82
+Pull requests
+9
+Discussions
+Actions
+Security
+Insights
+Complex Python + Rust layout #1372
+Closed
+Closed
+Complex Python + Rust layout
+#1372
+@alecandido
+Description
+alecandido
+opened on Dec 24, 2022
+At the moment, I have a Python distribution package managed by Poetry, and I'd like to implement one of its modules in Rust.
+
+On one side, I already had successful and pleasant experience using maturin, but I also like Poetry environment management, development dependencies, and lock files.
+
+I already had a look into issues and discussions, and found out that the two things are not incompatible: what I like of Poetry is not the build backend (i.e. poetry-core), but everything else.
+Following #1246, I'm willing to switch build backend from poetry-core to maturin, while retaining Poetry for development.
+
+Unfortunately, my package is already more complex than the proposed layouts, and I'd like to also introduce an extended Rust layout.
+In the following, I will outline the two levels of support I'm looking for: the first consist in better integration with pretty standard Python layout (and possibly Poetry, but I believe this not to be maturin's responsibility), the second is an extended Rust layout, yet not departing from standard practices.
+In order to clarify, I tried to collect the two layouts in a dedicated repo:
+
+https://github.com/AleCandido/atuin
+
+Multi-package Python
+At the moment, my current repository contains a single Python distribution package, but multiple import packages.
+
+I tried to follow the advice in #1246, retaining [tool.poetry], but implementing the src layout.
+In the repo, this is done in the alternate folder.
+
+With this layout, most of the expected workflow works smoothly, i.e.:
+
+I can install Python import packages with Poetry (declaring them in the [tools.poetry] section)
+I run poetry run maturin develop to recompile the Rust part and install in development
+I can package a working wheel by running poetry run maturin build
+The few places in which this is falling short are:
+
+maturin is currently not packaging the extra Python import packages
+Poetry front-end is not properly working (I'd expect poetry build to work similar to pip wheel ..., but it isn't, since it is not invoking the build backend)
+this I will raise on Poetry repo (after someone else's confirmation, if possible)
+It seems like nor PEP 517 neither PEP 621 define any way to specify multiple import packages, so I'd suggest to detect multiple folders in the src directory, and check they contain a top-level __init__.py file.
+
+Rust workspace
+One of the reasons to switch to Rust was to release this part with API for a different language (i.e. make a Rust crate), and possibly provide C bindings as well.
+
+This is more comfortably developed in distinct crates, and multiple crates might be useful for further use cases.
+I do not ant all of them to be packaged by maturin, since a single one will contain the Python package in the end, but I'd like to develop them altogether in as single workspace.
+
+So, what I'd like from maturin, and it doesn't seem to be currently possible, is to locate the crate inside a workspace contained in the same rust directory specified in the alternate layout.
+
+In the repo, this is attempted in the workspace folder.
+In particular, the one presented in this folder is the full layout with two import packages and two crates:
+
+the "main" Python package is tubul, depending on tphon package resulting from the corresponding crate
+then there is a second package jerakeen, providing some further utilities, and depending on tubul
+the crate to be recognized by maturin is tphon, as said before, then on its turn depends on
+berilia, that is the crate expected to do the heavy lift, and it has no dependence on any other code contained in the package
+berilia in particular does not have to be known to maturin, but it is just used as a path dependency of tphon, that will be resolved by Cargo during compilation.
+I'd like to release berilia as a stand-alone crate on https://crates.io, with no trace of Python packaging.
+
+I know I wrote a lengthy issue, and it might be not so straightforward to implement. However, I expect this not to be incredibly complex: it essentially boils down to add further import packages on the Python side, and recognize a nested crate.
+If the project makes sense, I'd be happy to provide some help (even a full proposal in a PR) to implement this, if possible with little guidance.
+
+Activity
+
+alecandido
+added 
+enhancement
+New feature or request
+ on Dec 24, 2022
+alecandido
+alecandido commented on Dec 24, 2022
+alecandido
+on Dec 24, 2022
+Author
+I tried to carefully look for issues and discussions, sorry if I missed something already existing...
+
+
+alecandido
+mentioned this on Dec 24, 2022
+Split anomalous dimensions into a Rust crate NNPDF/eko#185
+messense
+messense commented on Dec 24, 2022
+messense
+on Dec 24, 2022
+Member
+Multi-package Python
+
+IMO maturin is designed specified for bridging Rust and Python, so we didn't try to support packaging multi-package Python project.
+
+so I'd suggest to detect multiple folders in the src directory, and check they contain a top-level __init__.py file.
+
+We can certainly support this, but I wonder if it's better to just keep extension modules simple and package pure Python module separately? It'd simplify the whole setup. And IMO pip install a results in installing both a and b from one wheel can be confusing. (pymongo is an example, it will install both pymongo and bson from one wheel, but if an user accidentally pip install bson, the python environment can blow up weirdly).
+
+So, what I'd like from maturin, and it doesn't seem to be currently possible, is to locate the crate inside a workspace contained in the same rust directory specified in the alternate layout.
+
+You can use the [tool.maturin.manifest-path] option in pyproject.toml to point to the right Cargo.toml, see https://maturin.rs/metadata.html#add-maturin-build-options
+
+alecandido
+alecandido commented on Dec 24, 2022
+alecandido
+on Dec 24, 2022 · edited by alecandido
+Author
+You can use the [tool.maturin.manifest-path] option in pyproject.toml to point to the right Cargo.toml, see https://maturin.rs/metadata.html#add-maturin-build-options
+
+Ok, thank you, this is enough to solve this part :)
+I expected to be as simple as locating it, but I haven't been able to find that it was already possible to specify a locator, sorry...
+
+We can certainly support this, but I wonder if it's better to just keep extension modules simple and package pure Python module separately? It'd simplify the whole setup.
+
+That I accept as a useful advice, but at the moment I can't choose. The package is already existing this way, so, in order to minimize the migration cost, I need to support current layout.
+In some sense, that was a poor replacement for a Poetry monorepo, not yet existing (even if people in the Poetry community are discussing this option since some time python-poetry/poetry#936, python-poetry/poetry#2270, python-poetry/poetry#6850), using pip extras to split dependencies of the further packages.
+
+However, I guess it does not hurt to maturin to support this option, even though it won't be the default one.
+Do you think would it take long to work it out?
+
+In any case, I modified the workflows layout in the repo to support the workspace, while the full-blown one (the one with only different names, of course not working) is now in the full folder.
+
+messense
+messense commented on Dec 25, 2022
+messense
+on Dec 25, 2022
+Member
+I will take a look after recovering from covid soon.
+
+alecandido
+alecandido commented on Dec 26, 2022
+alecandido
+on Dec 26, 2022
+Author
+I will take a look after recovering from covid soon.
+
+Thank you!
+I'm sorry for your troubles: take your time and take care of yourself.
+
+davidhewitt
+davidhewitt commented on Dec 26, 2022
+davidhewitt
+on Dec 26, 2022
+Member
++1, rest well and hope you have a swift recovery @messense!
+
+messense
+messense commented on Dec 28, 2022
+messense
+on Dec 28, 2022 · edited by messense
+Member
+It seems like nor PEP 517 neither PEP 621 define any way to specify multiple import packages, so I'd suggest to detect multiple folders in the src directory, and check they contain a top-level __init__.py file.
+
+I think we can start with a conservative approach by providing a [tool.maturin.python-packages] option in pyproject.toml:
+
+[tool.maturin]
+python-packages = ["foo", "bar"]
+What do you think? @alecandido
+
+Implemented in #1378
+
+
+messense
+mentioned this on Dec 28, 2022
+Add support for packaging multiple pure Python packages #1378
+konstin
+konstin commented on Dec 28, 2022
+konstin
+on Dec 28, 2022
+Member
+personally, i'd strongly favor a one top level package per wheel rule, where the package has the same name as the wheel. the main problem is that we have otherwise no control and no introspection which packages get installed through a wheel, and there might even be silent overwrites (this is already a problem currently, as with the bson example). i know it's cumbersome to manage multiple local wheels, but i think that's better solved by make/nox/etc combining multiple tools.
+
+alecandido
+alecandido commented on Dec 28, 2022
+alecandido
+on Dec 28, 2022
+Author
+I think we can start with a conservative approach by providing a [tool.maturin.python-packages] option in pyproject.toml:
+
+I would say that the conservative approach is perfect also in the long-run: as you said, and @konstin remarked, the same-named single package per wheel is a simpler layout with less surprises, and it should be favored (it is already enough counter-intuitive to pip install pyyaml and after that import yaml), but I believe the flexibility is some time needed, and the pyhon-packages config is best-suited for customize the default sensible behavior.
+
+Consider that, in some cases, the overwriting might also be explicit, e.g. with drop-in replacements (consider the example of pdbpp). Whether you like it or not is a choice that is left to the package developers and users. If PyPA currently provides these options (many packages per wheel, arbitrary names), it should not be limited by tooling. Even though an opinionated default is more than reasonable.
+Consider that also black, "The Uncompromising Code Formatter", is providing optional configurations (but the Pro-tip is eloquent enough).
+
+messense
+messense commented on Dec 28, 2022
+messense
+on Dec 28, 2022
+Member
+I think a python-packages config is a good middle ground to allow wider adoption of maturin. I've seen people saying that maturin isn't powerful enough to use, I hope we can change that by providing some useful customizations.
+
+alecandido
+alecandido commented on Dec 28, 2022
+alecandido
+on Dec 28, 2022
+Author
+For me, maturin has always been the tool of choice. I much prefer to contribute and improve it than switching to something else :)
+(but most of the times it just works out of the box 😉)
+
+
+bors
+added a commit that references this issue on Dec 29, 2022
+Merge #1378
+
+Verified
+c627d88
+alecandido
+alecandido commented on Dec 29, 2022
+alecandido
+on Dec 29, 2022 · edited by alecandido
+Author
+Somehow they are still undetected, but maybe I'm doing something wrong:
+
+Archive:  atuin-0.1.0-cp310-cp310-manylinux_2_34_x86_64.whl.zip
+  inflating: atuin-0.1.0.dist-info/METADATA
+  inflating: atuin-0.1.0.dist-info/WHEEL
+  inflating: tphon/__init__.py
+  inflating: tphon/tphon.cpython-310-x86_64-linux-gnu.so
+  inflating: atuin-0.1.0.dist-info/RECORD
+https://github.com/AleCandido/atuin/tree/6b54b627ea367ebc54729a4f388e7c0779235737/full
+
+E.g. should I specify the whole path in the src layout?
+
+messense
+messense commented on Dec 29, 2022
+messense
+on Dec 29, 2022 · edited by messense
+Member
+src layout requires mixed Rust/Python project(for the main Rust extension module), so you'll need to add a src/tphon/__init__.py at the moment.
+
+alecandido
+alecandido commented on Dec 30, 2022
+alecandido
+on Dec 30, 2022
+Author
+The problem is not tphon, that is always found even when not specified at all in python-packages (it is specified in manifest-path), but the other packages specified in the list, namely tubul and jerakeen.
+Putting tubul, src/tubul, or src/tubul/__init__.py, the package is never added to the wheel...
+
+messense
+messense commented on Dec 30, 2022
+messense
+on Dec 30, 2022
+Member
+Please, do give it a try instead of making false assumptions.
+
+$ RUST_LOG=maturin=debug maturin build -o dist
+2022-12-29T22:36:45.462662Z DEBUG maturin::project_layout: Found pyproject.toml in working directory at "/Users/messense/Projects/atuin/full/pyproject.toml"
+2022-12-29T22:36:45.473200Z DEBUG maturin::project_layout: Using cargo manifest path from pyproject.toml "rust/tphon/Cargo.toml"
+2022-12-29T22:36:45.475894Z DEBUG maturin::project_layout: Resolving cargo metadata from "/Users/messense/Projects/atuin/full/rust/tphon/Cargo.toml"
+2022-12-29T22:36:45.535189Z DEBUG maturin::project_layout: Project layout resolved project_root=/Users/messense/Projects/atuin/full python_dir=/Users/messense/Projects/atuin/full/src rust_module=/Users/messense/Projects/atuin/full/src/tphon python_module=/Users/messense/Projects/atuin/full/src/tphon extension_name=tphon
+🍹 Building a mixed python/rust project
+🔗 Found pyo3 bindings
+🐍 Found CPython 3.11 at /Users/messense/.pyenv/versions/3.11.0/bin/python3
+2022-12-29T22:36:45.688591Z DEBUG maturin::compile: Setting additional linker args for macOS: ["-C", "link-arg=-undefined", "-C", "link-arg=dynamic_lookup", "-C", "link-args=-Wl,-install_name,@rpath/tphon.cpython-311-darwin.so"]
+2022-12-29T22:36:45.718421Z DEBUG maturin::compile: Running "cargo" "rustc" "--manifest-path" "/Users/messense/Projects/atuin/full/rust/tphon/Cargo.toml" "--message-format" "json" "--lib" "--" "-C" "link-arg=-undefined" "-C" "link-arg=dynamic_lookup" "-C" "link-args=-Wl,-install_name,@rpath/tphon.cpython-311-darwin.so"
+    Finished dev [unoptimized + debuginfo] target(s) in 0.03s
+⚠️  Warning: Couldn't find the symbol `PyInit_tphon` in the native library. Python will fail to import this module. If you're using pyo3, check that `#[pymodule]` uses `tphon` as module name
+2022-12-29T22:36:45.881313Z DEBUG maturin::module_writer: Adding tphon-0.1.0.dist-info/METADATA
+2022-12-29T22:36:45.882770Z DEBUG maturin::module_writer: Adding tphon-0.1.0.dist-info/WHEEL
+2022-12-29T22:36:45.886970Z DEBUG maturin::module_writer: Adding tphon/__init__.py from /Users/messense/Projects/atuin/full/src/tphon/__init__.py
+2022-12-29T22:36:45.888885Z DEBUG maturin::module_writer: Adding jerakeen/__init__.py from /Users/messense/Projects/atuin/full/src/jerakeen/__init__.py
+2022-12-29T22:36:45.890923Z DEBUG maturin::module_writer: Adding tubul/__init__.py from /Users/messense/Projects/atuin/full/src/tubul/__init__.py
+2022-12-29T22:36:45.891180Z DEBUG maturin::module_writer: Adding tphon/tphon.cpython-311-darwin.so from /Users/messense/Projects/atuin/full/rust/target/debug/maturin/libtphon.dylib
+2022-12-29T22:36:45.982344Z DEBUG maturin::module_writer: Adding tphon-0.1.0.dist-info/RECORD
+📦 Built wheel for CPython 3.11 to dist/tphon-0.1.0-cp311-cp311-macosx_11_0_arm64.whl
+messense
+messense commented on Dec 30, 2022
+messense
+on Dec 30, 2022
+Member
+Anyway, I've opened #1380 to allow detecting src-layout when the main Rust extension module is a pure Rust project.
+
+alecandido
+alecandido commented on Dec 30, 2022
+alecandido
+on Dec 30, 2022 · edited by alecandido
+Author
+Please, do give it a try instead of making false assumptions.
+
+I'm sorry if I missed something, but I actually gave a try. I didn't try to run with RUST_LOG=maturin=debug, but later inflating the wheel I got nothing:
+
+❯ git diff
+
+full/pyproject.toml
+
+────────────────────┐
+13: classifiers = [ │
+────────────────────┘
+│ 13 │                                                   │ 13 │
+│ 14 │[tool.maturin]                                     │ 14 │[tool.maturin]
+│ 15 │manifest-path = "rust/tphon/Cargo.toml"            │ 15 │manifest-path = "rust/tphon/Cargo.toml"
+│ 16 │python-packages = ["tubul", "jerakeen"]            │ 16 │python-packages = ["src/tubul/__init__.py", "src/↵
+│    │                                                   │    │jerakeen/__init__.py"]
+│ 17 │                                                   │ 17 │
+│ 18 │[tool.poetry]                                      │ 18 │[tool.poetry]
+│ 19 │name = "atuin"                                     │ 19 │name = "atuin"
+
+❯ poe build
+Poe => maturin build
+🔗 Found pyo3 bindings
+🐍 Found CPython 3.10 at /home/alessandro/.cache/pypoetry/virtualenvs/atuin-PGlvhnBh-py3.10/bin/python3
+    Finished dev [unoptimized + debuginfo] target(s) in 0.01s
+📦 Built wheel for CPython 3.10 to /mnt/cave/Projects/Misc/atuin/full/rust/target/wheels/atuin-0.1.0-cp310-cp310-manylinux_2_34_x86_64.whl
+❯ mv atuin-0.1.0-cp310-cp310-manylinux_2_34_x86_64.whl atuin-0.1.0-cp310-cp310-manylinux_2_34_x86_64.whl.zip
+❯ unzip atuin-0.1.0-cp310-cp310-manylinux_2_34_x86_64.whl.zip
+Archive:  atuin-0.1.0-cp310-cp310-manylinux_2_34_x86_64.whl.zip
+  inflating: atuin-0.1.0.dist-info/METADATA
+  inflating: atuin-0.1.0.dist-info/WHEEL
+  inflating: tphon/__init__.py
+  inflating: tphon/tphon.cpython-310-x86_64-linux-gnu.so
+  inflating: atuin-0.1.0.dist-info/RECORD
+Same output without __init__.py.
+
+To complete the report:
+
+❯ poetry run maturin -V
+maturin 0.14.8-beta.1
+and the logs
+For convenience, I added the commit to the demo project alecandido/atuin@fb8073d.
+
+alecandido
+alecandido commented on Dec 30, 2022
+alecandido
+on Dec 30, 2022
+Author
+⚠️  Warning: Couldn't find the symbol `PyInit_tphon` in the native library. Python will fail to import this module. If you're using pyo3, check that `#[pymodule]` uses `tphon` as module name
+Moreover, you were definitely using an old commit, since in alecandido/atuin@6b54b62 I also changed the name of the module function in full/rust/tphon/src/lib.rs, so it was not raising any warning.
+
+Can you give me the commit you used, and the git diff, such that I can try as well?
+
+messense
+messense commented on Dec 30, 2022
+messense
+on Dec 30, 2022
+Member
+so you'll need to add a src/tphon/__init__.py at the moment.
+
+Ok, so it's a misunderstanding, I mean this by
+
+mkdir src/tphon
+touch src/tphon/__init__.py
+python-packages should be just the name of the packages, python-packages = ["tubul", "jerakeen"] is correct.
+
+alecandido
+alecandido commented on Dec 30, 2022
+alecandido
+on Dec 30, 2022 · edited by alecandido
+Author
+Ok, I managed to see it working :D
+
+But there was even one extra step required (I inferred from your logs): the project name should be the same of the Rust module, implemented in alecandido/atuin@d2fdec8
+
+In any case, this is not really a limitation for myself: if I want a crate with a different name I can always put a "bridge" crate for the bindings with the same name of the project.
+I believe it might be the same for everyone else, since usually you happen to use this layout if you want to add a Rust extension, so you are always free to pick the correct name on the Rust side. And Python as well, using an extra package if needed (e.g. PyYAML can add an internal package named pyyaml and a corresponding crate with the same name).
+
+messense
+messense commented on Dec 30, 2022
+messense
+on Dec 30, 2022
+Member
+so you'll need to add a src/tphon/__init__.py at the moment.
+
+Now this isn't required anymore in 0.14.8b2, a pure Rust project should just work.
+
+
+messense
+closed this as completedon Dec 30, 2022
+alecandido
+alecandido commented on Dec 30, 2022
+alecandido
+on Dec 30, 2022
+Author
+Thank you, it works perfectly!
+(btw, it works also with the different project name)
+
+messense
+messense commented on Jan 1, 2023
+messense
+on Jan 1, 2023
+Member
+v0.14.8 is out.
+
+p1skiii
+Add a comment
+new Comment
+Markdown input: edit mode selected.
+Write
+Preview
+Use Markdown to format your comment
+Remember, contributions to this repository should follow its code of conduct.
+Metadata
+Assignees
+No one assigned
+Labels
+enhancement
+New feature or request
+Type
+No type
+Projects
+No projects
+Milestone
+No milestone
+Relationships
+None yet
+Development
+No branches or pull requests
+NotificationsCustomize
+You're not receiving notifications from this thread.
+
+Participants
+@messense
+@davidhewitt
+@konstin
+@alecandido
+Issue actions
+Footer
+© 2025 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact
+Manage cookies
+Do not share my personal information
+Complex Python + Rust layout · Issue #1372 · PyO3/maturin
