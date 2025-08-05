@@ -1,8 +1,0 @@
-Metadata-Version: 2.4
-Name: opendal
-Version: 0.45.20
-Summary: OpenDAL Python binding
-Author-email: Apache OpenDAL <dev@opendal.apache.org>
-License: Apache-2.0
-Requires-Python: >=3.8
-Requires-Dist: opendal-core==0.45.20

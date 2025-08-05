@@ -1,8 +1,0 @@
-README.md
-pyproject.toml
-src/opendal/__init__.py
-src/opendal.egg-info/PKG-INFO
-src/opendal.egg-info/SOURCES.txt
-src/opendal.egg-info/dependency_links.txt
-src/opendal.egg-info/requires.txt
-src/opendal.egg-info/top_level.txt
